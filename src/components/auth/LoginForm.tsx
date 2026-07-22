@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -6,10 +7,14 @@ import Input from "../common/Input";
 import Button from "../common/Button";
 
 import { loginSchema } from "../../schemas/auth.schema";
-
 import type { LoginFormData } from "../../schemas/auth.schema";
 
+import { authService } from "../../services/auth.service";
+import { setToken } from "../../utils/authStorage";
+
 function LoginForm() {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -19,8 +24,16 @@ function LoginForm() {
     mode: "onSubmit",
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log("Login data:", data);
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await authService.login(data);
+
+      setToken(response.accessToken);
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
