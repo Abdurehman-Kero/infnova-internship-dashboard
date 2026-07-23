@@ -2,36 +2,61 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "../pages/Login/LoginPage";
 
-import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardPage from "../pages/Dashboard/DashboardPage";
+
+import ApplicantsPage from "../pages/Applicants/ApplicantsPage";
 
 import DashboardLayout from "../layouts/DashboardLayout";
-import DashboardPage from "../pages/Dashboard/DashboardPage";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import ApplicantDetailsPage from "../pages/ApplicantDetails/ApplicantDetailsPage";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Route */}
+
         <Route
           path="/login"
 
           element={<LoginPage />}
         />
 
-        {/* Protected Routes */}
+        {/* Protected Application Routes */}
+
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Dashboard Home */}
+            <Route
+              path="/applicants/:id"
+
+              element={<ApplicantDetailsPage />}
+            />
+            <Route
+              path="/dashboard"
+
+              element={<DashboardPage />}
+            />
+
+            {/* Applicants */}
+
+            <Route
+              path="/applicants"
+
+              element={<ApplicantsPage />}
+            />
           </Route>
         </Route>
 
-        {/* Fallback Route */}
+        {/* Redirect Unknown Routes */}
+
         <Route
           path="*"
 
           element={
             <Navigate
-              to="/login"
+              to="/dashboard"
 
               replace
             />

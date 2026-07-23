@@ -1,6 +1,6 @@
 const TOKEN_KEY = "accessToken";
 
-export function setToken(token: string) {
+export function saveToken(token: string) {
   localStorage.setItem(TOKEN_KEY, token);
 }
 

@@ -23,9 +23,14 @@ api.interceptors.request.use(
 );
 api.interceptors.response.use(
   (response) => response,
+
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("accessToken");
+
+      localStorage.removeItem("user");
+
+      window.location.href = "/login?session=expired";
     }
 
     return Promise.reject(error);

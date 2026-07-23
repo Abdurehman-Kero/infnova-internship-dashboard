@@ -2,121 +2,136 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { useForm } from "react-hook-form";
+import { useAuth } from "../../hooks/useAuth";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-
-import Card from "../common/Card";
-import Input from "../common/Input";
 import Button from "../common/Button";
 
-import { loginSchema } from "../../schemas/auth.schema";
+import Input from "../common/Input";
 
-import type { LoginFormData } from "../../schemas/auth.schema";
-
-import { useAuth } from "../../hooks/useAuth";
+import Card from "../common/Card";
 
 function LoginForm() {
   const navigate = useNavigate();
 
   const { login } = useAuth();
 
-  const [serverError, setServerError] = useState<string>("");
+  const [email, setEmail] = useState("");
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const [password, setPassword] = useState("");
 
-    mode: "onSubmit",
-  });
+  const [error, setError] = useState("");
 
-  const onSubmit = async (data: LoginFormData) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setError("");
+
+    if (!email || !password) {
+      setError("Email and password are required.");
+
+      return;
+    }
+
     try {
-      setServerError("");
+      setLoading(true);
 
-      await login(data.email, data.password);
+      await login({
+        email,
+
+        password,
+      });
 
       navigate("/dashboard");
-    } catch (error: any) {
-      if (error.response?.status === 401) {
-        setServerError("Invalid email or password.");
-      } else if (!error.response) {
-        setServerError("Network error. Please check your internet connection.");
-      } else {
-        setServerError("Something went wrong. Please try again later.");
-      }
+    } catch (error) {
+      setError("Invalid email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Card className="max-w-md">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
+    <Card>
+      <div
+        className="
+        mb-6
+        text-center
+        "
+      >
+        <h1
+          className="
+          text-3xl
+          font-bold
+          text-slate-800
+          "
+        >
+          INFNOVA Dashboard
+        </h1>
 
-        <p className="mt-2 text-sm text-slate-500">
-          Sign in to manage internship applicants
+        <p
+          className="
+          mt-2
+          text-slate-500
+          "
+        >
+          Admin Login
         </p>
       </div>
 
-      {serverError && (
+      {error && (
         <div
           className="
-            mb-5
+            mb-4
             rounded-lg
-            border
-            border-red-200
             bg-red-50
             p-3
             text-sm
             text-red-700
             "
         >
-          {serverError}
+          {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form
+        onSubmit={handleSubmit}
+
+        className="
+        space-y-4
+        "
+      >
+      
+      
+
         <Input
-          id="email"
-
-          label="Email Address"
-
           type="email"
 
-          placeholder="admin@infnova.tech"
+          label="Email"
 
-          autoComplete="email"
+          placeholder="Email address"
 
-          {...register("email")}
+          value={email}
 
-          error={errors.email?.message}
+          onChange={(e) => setEmail(e.target.value)}
         />
-
         <Input
-          id="password"
+          type="password"
 
           label="Password"
 
-          type="password"
+          placeholder="Password"
 
-          placeholder="Enter your password"
+          value={password}
 
-          autoComplete="current-password"
-
-          {...register("password")}
-
-          error={errors.password?.message}
+          onChange={(e) => setPassword(e.target.value)}
         />
-
         <Button
           type="submit"
 
-          loading={isSubmitting}
+          disabled={loading}
         >
-          Sign In
+          {loading ? "Logging in..." : "Login"}
         </Button>
       </form>
     </Card>

@@ -13,59 +13,149 @@ function DashboardPage() {
 
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const data = await dashboardService.getSummary();
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
 
-        setStats(data);
-      } catch (error) {
-        setError("Failed to load dashboard statistics.");
-      } finally {
-        setLoading(false);
-      }
+      setError("");
+
+      const data = await dashboardService.getSummary();
+
+      setStats(data);
+    } catch (error) {
+      setError("Failed to load dashboard statistics.");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchStats();
   }, []);
 
   if (loading) {
-    return <div>Loading statistics...</div>;
+    return (
+      <div
+        className="
+        space-y-6
+        "
+      >
+        <div
+          className="
+          h-8
+          w-56
+          animate-pulse
+          rounded
+          bg-slate-200
+          "
+        />
+
+        <div
+          className="
+          grid
+          gap-4
+
+          sm:grid-cols-2
+
+          lg:grid-cols-4
+          "
+        >
+          {[1, 2, 3, 4].map((item) => (
+            <div
+              key={item}
+
+              className="
+                h-32
+                animate-pulse
+                rounded-xl
+                bg-slate-200
+                "
+            />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
       <div
         className="
-        rounded-lg
+        rounded-xl
         bg-red-50
-        p-4
+        p-5
         text-red-700
         "
       >
-        {error}
+        <p
+          className="
+          mb-3
+          font-medium
+          "
+        >
+          {error}
+        </p>
+
+        <button
+          onClick={fetchStats}
+
+          className="
+          rounded-lg
+          bg-red-600
+          px-4
+          py-2
+          text-sm
+          text-white
+          hover:bg-red-700
+          "
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1
-        className="
-        mb-6
-        text-3xl
-        font-bold
-        text-slate-800
-        "
-      >
-        Dashboard Overview
-      </h1>
+    <div
+      className="
+      space-y-6
+
+      p-1
+
+      sm:p-2
+      "
+    >
+      <div>
+        <h1
+          className="
+          text-2xl
+          font-bold
+          text-slate-800
+
+          sm:text-3xl
+          "
+        >
+          Dashboard Overview
+        </h1>
+
+        <p
+          className="
+          mt-1
+          text-sm
+          text-slate-500
+          "
+        >
+          Monitor internship applications and status overview.
+        </p>
+      </div>
 
       <div
         className="
         grid
-        gap-6
+        gap-4
+
         sm:grid-cols-2
+
         lg:grid-cols-4
         "
       >
@@ -86,6 +176,7 @@ function DashboardPage() {
 
           value={stats?.byStatus?.accepted ?? 0}
         />
+
         <StatsCard
           title="Rejected"
 
