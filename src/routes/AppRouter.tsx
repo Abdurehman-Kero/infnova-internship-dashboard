@@ -4,25 +4,39 @@ import LoginPage from "../pages/Login/LoginPage";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
-function Dashboard() {
-  return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold">Dashboard Coming Soon</h1>
-    </div>
-  );
-}
+import DashboardLayout from "../layouts/DashboardLayout";
+import DashboardPage from "../pages/Dashboard/DashboardPage";
 
 function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        {/* Public Routes */}
+        <Route
+          path="/login"
 
+          element={<LoginPage />}
+        />
+
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
         </Route>
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Fallback Route */}
+        <Route
+          path="*"
+
+          element={
+            <Navigate
+              to="/login"
+
+              replace
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
