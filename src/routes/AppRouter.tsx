@@ -2,8 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import LoginPage from "../pages/Login/LoginPage";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function Dashboard() {
-  return <h1 className="p-10 text-3xl font-bold">Dashboard Coming Soon</h1>;
+  return (
+    <div className="p-10">
+      <h1 className="text-3xl font-bold">Dashboard Coming Soon</h1>
+    </div>
+  );
 }
 
 function AppRouter() {
@@ -12,7 +18,9 @@ function AppRouter() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

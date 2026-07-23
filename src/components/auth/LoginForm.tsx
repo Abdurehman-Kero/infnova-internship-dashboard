@@ -1,5 +1,9 @@
+import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import Card from "../common/Card";
@@ -7,13 +11,17 @@ import Input from "../common/Input";
 import Button from "../common/Button";
 
 import { loginSchema } from "../../schemas/auth.schema";
+
 import type { LoginFormData } from "../../schemas/auth.schema";
 
-import { authService } from "../../services/auth.service";
-import { setToken } from "../../utils/authStorage";
+import { useAuth } from "../../hooks/useAuth";
 
 function LoginForm() {
   const navigate = useNavigate();
+
+  const { login } = useAuth();
+
+  const [serverError, setServerError] = useState<string>("");
 
   const {
     register,
@@ -21,18 +29,25 @@ function LoginForm() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+
     mode: "onSubmit",
   });
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await authService.login(data);
+      setServerError("");
 
-      setToken(response.accessToken);
+      await login(data.email, data.password);
 
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        setServerError("Invalid email or password.");
+      } else if (!error.response) {
+        setServerError("Network error. Please check your internet connection.");
+      } else {
+        setServerError("Something went wrong. Please try again later.");
+      }
     }
   };
 
@@ -46,28 +61,61 @@ function LoginForm() {
         </p>
       </div>
 
+      {serverError && (
+        <div
+          className="
+            mb-5
+            rounded-lg
+            border
+            border-red-200
+            bg-red-50
+            p-3
+            text-sm
+            text-red-700
+            "
+        >
+          {serverError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <Input
           id="email"
+
           label="Email Address"
+
           type="email"
+
           placeholder="admin@infnova.tech"
+
           autoComplete="email"
+
           {...register("email")}
+
           error={errors.email?.message}
         />
 
         <Input
           id="password"
+
           label="Password"
+
           type="password"
+
           placeholder="Enter your password"
+
           autoComplete="current-password"
+
           {...register("password")}
+
           error={errors.password?.message}
         />
 
-        <Button type="submit" loading={isSubmitting}>
+        <Button
+          type="submit"
+
+          loading={isSubmitting}
+        >
           Sign In
         </Button>
       </form>
